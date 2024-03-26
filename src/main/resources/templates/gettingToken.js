@@ -9,7 +9,7 @@
     // consider using POST so query isn't logged
     req.open('GET', 'http://localhost:8080/saveToken?' + queryString, true);
     req.onreadystatechange = function (e) {
-      if (req.status == 200) {
+      if (req.status === 200) {
         alert('Ok');
       }
       else {

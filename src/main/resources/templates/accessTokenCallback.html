@@ -8,18 +8,19 @@
     <p>Got</p>
 </body>
 <script>
-        // First, parse the query string
+    // First, parse the query string
     var params = {}, queryString = location.hash.substring(1),
         regex = /([^&=]+)=([^&]*)/g, m;
     while (m = regex.exec(queryString)) {
       params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
     }
+
     // And send the token over to the server
     var req = new XMLHttpRequest();
     // consider using POST so query isn't logged
-    req.open('GET', 'https://6354-2a00-f41-88a-ce5-ec54-3d92-94c8-ea31.ngrok-free.app/saveToken?' + queryString, true);
+    req.open('GET', 'https://df56-2a01-113f-904-7200-4113-9b1c-5703-4d78.ngrok-free.app/saveToken?' + queryString, true);
     req.onreadystatechange = function (e) {
-      if (req.status == 200) {
+      if (req.status === 200) {
         alert('Ok');
       }
       else {
