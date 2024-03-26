@@ -1,7 +1,7 @@
 package com.example.Memories.controller;
 
 import com.example.Memories.model.Photo;
-import com.example.Memories.model.PhotoRepository;
+import com.example.Memories.model.repositories.PhotoRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

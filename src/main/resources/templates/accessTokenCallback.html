@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Getting token</title>
@@ -9,17 +9,16 @@
 </body>
 <script>
     // First, parse the query string
-    var params = {}, queryString = location.hash.substring(1),
+    let params = {}, queryString = location.hash.substring(1),
         regex = /([^&=]+)=([^&]*)/g, m;
     while (m = regex.exec(queryString)) {
       params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
     }
-
+    const redirectUrl = /*[[${redirectUrl}]]*/ '';
     // And send the token over to the server
-    var req = new XMLHttpRequest();
-    // consider using POST so query isn't logged
-    req.open('GET', 'https://df56-2a01-113f-904-7200-4113-9b1c-5703-4d78.ngrok-free.app/saveToken?' + queryString, true);
-    req.onreadystatechange = function (e) {
+    const req = new XMLHttpRequest();
+    req.open('GET', redirectUrl + '/saveToken?' + queryString, true);
+    req.onreadystatechange = function () {
       if (req.status === 200) {
         alert('Ok');
       }

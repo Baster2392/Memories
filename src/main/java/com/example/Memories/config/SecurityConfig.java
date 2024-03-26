@@ -10,6 +10,8 @@ public class SecurityConfig {
     @Bean
     public DefaultSecurityFilterChain webSecurityConfiguration(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests().anyRequest().permitAll();
+        httpSecurity.csrf().disable();
+        httpSecurity.headers().frameOptions().disable();
         return httpSecurity.build();
     }
 }

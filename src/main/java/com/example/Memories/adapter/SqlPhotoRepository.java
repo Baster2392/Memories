@@ -1,7 +1,7 @@
 package com.example.Memories.adapter;
 
 import com.example.Memories.model.Photo;
-import com.example.Memories.model.PhotoRepository;
+import com.example.Memories.model.repositories.PhotoRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
