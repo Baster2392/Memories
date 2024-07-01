@@ -1,6 +1,7 @@
 package com.example.Memories.model;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,16 +18,30 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private String username;
-    @OneToOne
-    private UserTokens userTokens;
-    @OneToMany
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ImgurToken imgurToken;
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Memory> memories;
 
-    public User(String username, UserTokens credentials, List<Memory> memories) {
+    public User(String username, ImgurToken imgurToken, List<Memory> memories) {
         this.username = username;
-        this.userTokens = credentials;
+        this.imgurToken = imgurToken;
         this.memories = memories;
+        if (imgurToken != null) {
+            imgurToken.setUser(this);
+        }
+    }
+
+    @Transactional
+    public void refreshImgurToken(ImgurToken token) {
+        if (imgurToken != null) {
+            imgurToken.setUser(null);
+        }
+        imgurToken = token;
+        if (token != null) {
+            token.setUser(this);
+        }
     }
 }

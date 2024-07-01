@@ -1,0 +1,18 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          imgur:
+            client-id: e098f53069f80d6
+            client-secret: 66f76092c15baf6694933411b2cef382c5b12ca6
+            scope: ["read"]
+            redirect-uri: "https://api.imgur.com/oauth2/authorize?client_id={client-id}&response_type=token&state=RUNNING"
+            authorization-grant-type: authorization_code
+            client-name: Memories
+        provider:
+          imgur:
+            authorization-uri: https://api.imgur.com/oauth2/authorize
+            token-uri: https://api.imgur.com/oauth2/token
+            user-info-uri: https://api.imgur.com/3/account/me
+            user-name-attribute: url

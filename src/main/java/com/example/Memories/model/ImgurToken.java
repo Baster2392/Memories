@@ -1,8 +1,6 @@
 package com.example.Memories.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,17 +11,26 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserTokens {
+public class ImgurToken {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long tokenId;
+
     @OneToOne
+    @JoinColumn(name = "user_id")
     private User user;
     private String accessToken;
     private String refreshToken;
     private Integer expiresIn;
 
-    public UserTokens(String accessToken, String refreshToken, Integer expiresIn) {
+    public ImgurToken(String accessToken, String refreshToken, Integer expiresIn) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.expiresIn = expiresIn;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+        this.tokenId = user != null ? user.getId() : null;
     }
 }
