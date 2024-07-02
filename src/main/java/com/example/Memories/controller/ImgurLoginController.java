@@ -4,6 +4,8 @@ import com.example.Memories.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,14 +24,14 @@ public class ImgurLoginController {
         this.service = service;
     }
 
-    @GetMapping("/token")
+    @GetMapping("/imgur/login")
     public RedirectView redirectToImgur() {
        String tokenUrl = "https://api.imgur.com/oauth2/authorize?client_id=" +
                 clientId + "&response_type=token&state=RUNNING";
         return new RedirectView(tokenUrl);
     }
 
-    @GetMapping(value = "/callback", produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(value = "imgur/callback", produces = MediaType.TEXT_HTML_VALUE)
     public String getAuthToken(Model model) {
         model.addAttribute("redirectUrl", redirectUrl);
         return "accessTokenCallback";
@@ -54,5 +56,12 @@ public class ImgurLoginController {
     @GetMapping(value = "/logged", produces = MediaType.TEXT_HTML_VALUE)
     public String logged() {
         return "loggedToImgur";
+    }
+
+    @GetMapping(value = "/")
+    public String home(Model model, Authentication authentication) {
+        OAuth2User user = (OAuth2User) authentication.getPrincipal();
+        model.addAttribute("userName", user.getAttribute("given_name"));
+        return "home";
     }
 }
