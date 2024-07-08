@@ -1,6 +1,9 @@
 package com.example.Memories.controller;
 
+import com.example.Memories.model.ImgurToken;
+import com.example.Memories.model.User;
 import com.example.Memories.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,19 +16,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
-public class ImgurLoginController {
+public class LoginController {
     @Value("${Memories.clientId}")
     private String clientId;
     @Value("${Memories.redirectUrl}")
     private String redirectUrl;
     private final UserService service;
+    private final HttpSession httpSession;
 
-    public ImgurLoginController(UserService service) {
+    public LoginController(UserService service, HttpSession httpSession) {
         this.service = service;
+        this.httpSession = httpSession;
     }
 
-    @GetMapping("/imgur/login")
-    public RedirectView redirectToImgur() {
+    @GetMapping("/imgur/connect")
+    public RedirectView connectToImgur() {
        String tokenUrl = "https://api.imgur.com/oauth2/authorize?client_id=" +
                 clientId + "&response_type=token&state=RUNNING";
         return new RedirectView(tokenUrl);
@@ -44,12 +49,8 @@ public class ImgurLoginController {
             @RequestParam("expires_in") Integer expiresIn,
             @RequestParam("account_username") String username
     ) {
-        System.out.println(accessToken);
-        System.out.println(refreshToken);
-        System.out.println(expiresIn);
-        System.out.println(username);
-
-        service.handleNewLogin(accessToken, refreshToken, expiresIn, username);
+        User user = (User) httpSession.getAttribute("user");
+        service.handleImgurLogin(user, accessToken, refreshToken, expiresIn, username);
         return ResponseEntity.ok().build();
     }
 
@@ -59,9 +60,23 @@ public class ImgurLoginController {
     }
 
     @GetMapping(value = "/")
-    public String home(Model model, Authentication authentication) {
-        OAuth2User user = (OAuth2User) authentication.getPrincipal();
-        model.addAttribute("userName", user.getAttribute("given_name"));
+    public String home(Model model) {
+        User user = (User) httpSession.getAttribute("user");
+        model.addAttribute("user", user);
+
+        ImgurToken imgurToken = user.getImgurToken();
+        if (imgurToken == null) {
+            imgurToken = new ImgurToken();
+        }
+
+        model.addAttribute("imgurToken", imgurToken);
         return "home";
+    }
+
+    @GetMapping(value = "/login_callback")
+    public RedirectView loginCallback(Authentication authentication) {
+        OAuth2User user = (OAuth2User) authentication.getPrincipal();
+        service.handleGoogleLogin(user);
+        return new RedirectView("/");
     }
 }

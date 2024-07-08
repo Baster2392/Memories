@@ -19,14 +19,16 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
+    private String name;
+    private String email;
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private ImgurToken imgurToken;
     @OneToMany(cascade = CascadeType.ALL)
     private List<Memory> memories;
 
-    public User(String username, ImgurToken imgurToken, List<Memory> memories) {
-        this.username = username;
+    public User(String name, String email, ImgurToken imgurToken, List<Memory> memories) {
+        this.name = name;
+        this.email = email;
         this.imgurToken = imgurToken;
         this.memories = memories;
         if (imgurToken != null) {
@@ -35,7 +37,7 @@ public class User {
     }
 
     @Transactional
-    public void refreshImgurToken(ImgurToken token) {
+    public void setImgurToken(ImgurToken token) {
         if (imgurToken != null) {
             imgurToken.setUser(null);
         }

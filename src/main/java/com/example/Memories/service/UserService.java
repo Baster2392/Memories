@@ -3,8 +3,8 @@ package com.example.Memories.service;
 import com.example.Memories.model.User;
 import com.example.Memories.model.ImgurToken;
 import com.example.Memories.model.repositories.UserRepository;
-import jakarta.persistence.EntityExistsException;
 import jakarta.transaction.Transactional;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,19 +22,33 @@ public class UserService {
         return repository.findAll();
     }
 
-    public void handleNewLogin(String accessToken, String refreshToken, Integer expiresIn, String username) {
-        ImgurToken token = new ImgurToken(null, null, accessToken, refreshToken, expiresIn);
-        List<User> foundUser = repository.findByUsername(username);
-        if (foundUser.isEmpty()) {
-            User newUser = new User(username, token, new ArrayList<>());
-            repository.save(newUser);
-        } else {
-            User user = foundUser.getFirst();
-            user.refreshImgurToken(token);
+    public void createNewUser(User user) {
+        repository.save(user);
+    }
+
+    public void handleGoogleLogin(OAuth2User oAuth2User) {
+        String email = oAuth2User.getAttribute("email");
+        String givenName = oAuth2User.getAttribute("given_name");
+
+        if (repository.findByEmail(email).isEmpty()) {
+            System.out.println(repository.findAll());
+            handleGoogleRegistration(email, givenName);
         }
     }
 
-    public void createNewUser(User user) {
+    private void handleGoogleRegistration(String email, String givenName) {
+        User newUser = new User(givenName, email, null, new ArrayList<>());
+        repository.save(newUser);
+    }
+
+    @Transactional
+    public void handleImgurLogin(User user, String accessToken, String refreshToken, Integer expiresIn, String username) {
+        ImgurToken imgurToken = new ImgurToken(accessToken, refreshToken, expiresIn + System.currentTimeMillis(), username);
+        user.setImgurToken(imgurToken);
         repository.save(user);
+    }
+
+    public List<User> findUserByEmail(String email) {
+        return repository.findByEmail(email);
     }
 }

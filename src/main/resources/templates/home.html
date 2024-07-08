@@ -2,10 +2,27 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <meta name="referrer" content="no-referrer">
+    <title>Memories</title>
 </head>
 <body>
-    <h1 th:text="'Hello, ' + ${userName}">Hello, user</h1>
-    <h2></h2>
+    <h1 th:text="'Hello, ' + ${user.getName()}">Hello, user</h1>
+    <h3>Your Imgur account</h3>
+    <div id="imgur-account-status">
+        <p th:text="'Your Imgur account name: ' + ${imgurToken.getImgurName()}"></p>
+    </div>
 </body>
+<script>
+    function onClickConnectToImgur() {
+        window.location.assign(window.location.href + "imgur/connect");
+    }
+
+    let imgurAccountName = "[[${imgurToken.getImgurName()}]]"
+    let imgurAccountStatus = document.getElementById("imgur-account-status")
+    if (imgurAccountName === "")
+    {
+        imgurAccountStatus.innerHTML = "<p>You don't have linked Imgur Account</p><br/>" +
+            "<button type='button' onclick=onClickConnectToImgur()>Connect to Imgur</button>"
+    }
+</script>
 </html>

@@ -1,10 +1,12 @@
 package com.example.Memories.model;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @Getter
@@ -18,15 +20,19 @@ public class ImgurToken {
 
     @OneToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private User user;
+    private String imgurName;
     private String accessToken;
     private String refreshToken;
-    private Integer expiresIn;
+    private Long expiresIn;
 
-    public ImgurToken(String accessToken, String refreshToken, Integer expiresIn) {
+    public ImgurToken(String accessToken, String refreshToken, Long expiresIn, String imgurName) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.expiresIn = expiresIn;
+        this.imgurName = imgurName;
     }
 
     public void setUser(User user) {
