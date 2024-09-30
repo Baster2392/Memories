@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Logged successfully</title>
+</head>
+<body>
+
+<h1>Galeria obrazów</h1>
+
+<div class="gallery">
+    <div th:each="image : ${images}">
+        <img th:src="${image.link}" alt="Obraz" width="400px"/>
+        <p th:text="${image.description}"></p>
+    </div>
+</div>
+
+</body>
+</html>
