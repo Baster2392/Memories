@@ -1,7 +1,6 @@
-package com.example.Memories.controller;
+package com.example.Memories.controller.rest;
 
 import com.example.Memories.model.User;
-import com.example.Memories.model.repositories.UserRepository;
 import com.example.Memories.service.UserService;
 import jakarta.persistence.EntityExistsException;
 import org.springframework.http.ResponseEntity;
@@ -11,11 +10,11 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping(value = "/users")
-public class UserController {
+@RequestMapping(value = "/api/users")
+public class UserRestController {
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    public UserRestController(UserService userService) {
         this.userService = userService;
     }
 

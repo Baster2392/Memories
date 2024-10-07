@@ -14,6 +14,8 @@ public interface UserRepository {
     User save(User user);
     List<User> findByName(String username);
     List<User> findByEmail(String email);
+    void deleteById(Long id);
+
 
     @Modifying
     @Transactional

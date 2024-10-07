@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Memories</title>
 </head>
 <body>
@@ -17,12 +19,38 @@
         window.location.assign(window.location.href + "imgur/connect");
     }
 
+    function onClickDisconnectImgur() {
+        const req = new XMLHttpRequest();
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        req.open('DELETE', window.location.href + "api/imgur/disconnect", true);
+        req.setRequestHeader(csrfHeader, csrfToken);
+
+        req.onreadystatechange = function () {
+            if (req.readyState === XMLHttpRequest.DONE) {
+                if (req.status !== 200) {
+                    alert(req.status + ": " + req.responseText);
+                } else {
+                    location.reload();
+                }
+            }
+        };
+
+        req.send(null);
+    }
+
     let imgurAccountName = "[[${imgurToken.getImgurName()}]]"
     let imgurAccountStatus = document.getElementById("imgur-account-status")
     if (imgurAccountName === "")
     {
         imgurAccountStatus.innerHTML = "<p>You don't have linked Imgur Account</p><br/>" +
             "<button type='button' onclick=onClickConnectToImgur()>Connect to Imgur</button>"
+    }
+    else
+    {
+        imgurAccountStatus.innerHTML = imgurAccountStatus.innerHTML +
+            "<br/><button type='button' onclick=onClickDisconnectImgur()>Disconnect from Imgur</button>"
     }
 </script>
 </html>

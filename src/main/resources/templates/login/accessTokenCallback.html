@@ -18,7 +18,7 @@
 
     // And send the token over to the server
     const req = new XMLHttpRequest();
-    req.open('GET', queryUrl + '/saveToken?' + queryString, true);
+    req.open('GET', queryUrl + '/api/imgur/saveToken?' + queryString, true);
     req.onreadystatechange = function () {
       if (req.status === 200) {
         let redirectUrl = queryUrl + '/logged';

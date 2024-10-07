@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Memory</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+<h1>Create Memory</h1>
+<form id="uploadForm" action="photos/upload" method="POST" enctype="multipart/form-data">
+    <h3>Title</h3>
+    <label for="title"></label><input type="text" id="title" name="title" />
+    <label for="description"></label><input type="text" id="description" name="description">
+    <label for="start-date"></label><input type="date" id="start-date" name="start date">
+    <label for="end-date"></label><input type="date" id="end-date" name="end date">
+
+    <input type="file" id="files" name="files" multiple accept="image/*,video/*">
+    <button type="submit">Upload</button>
+</form>
+
+</body>
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData();
+        const fileInput = document.getElementById('files');
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        let title = document.getElementById('title').value
+        let description = document.getElementById('description').value
+        let startDate = document.getElementById('start-date').value
+        let endDate = document.getElementById('end-date').value
+
+        formData.append('title', title)
+        formData.append('description', description)
+        formData.append('start_date', startDate)
+        formData.append('end_date', endDate)
+
+
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append('files', fileInput.files[i]);
+        }
+
+        const req = new XMLHttpRequest();
+        req.open('POST', window.location.origin + "/api/memories", true);
+        req.setRequestHeader(csrfHeader, csrfToken);
+
+        req.onreadystatechange = function () {
+            if (req.readyState === XMLHttpRequest.DONE) {
+                if (req.status !== 200) {
+                    alert(req.status + ": " + req.responseText);
+                } else {
+                    location.href = "/"
+                }
+            }
+        }
+
+        req.send(formData)
+    });
+</script>
+</html>

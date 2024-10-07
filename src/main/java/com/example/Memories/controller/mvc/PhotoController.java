@@ -1,6 +1,6 @@
-package com.example.Memories.controller;
+package com.example.Memories.controller.mvc;
 
-import com.example.Memories.model.ImgurImage;
+import com.example.Memories.model.response.ImgurImage;
 import com.example.Memories.model.User;
 import com.example.Memories.service.ImgurService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -9,12 +9,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Controller()
 @RequestMapping("/photos")
@@ -36,6 +36,10 @@ public class PhotoController {
     @GetMapping(value = "/all", produces = MediaType.TEXT_HTML_VALUE)
     public String getAllAccountImages(Model model) {
         User user = (User) httpSession.getAttribute("user");
+        if (user.getImgurToken() == null) {
+            return "redirect:/";
+        }
+
         List<ImgurImage> imgurImages;
         try {
             imgurImages = imgurService.getImages(user);
@@ -44,5 +48,24 @@ public class PhotoController {
         }
         model.addAttribute("images", imgurImages);
         return "allAccountImages";
+    }
+
+    @PostMapping(value = "/upload", produces = MediaType.TEXT_HTML_VALUE)
+    public String upload(
+            @RequestParam("title") String title,
+            @RequestParam("description") String description,
+            @RequestParam("start_date") String startDate,
+            @RequestParam("end_date") String endDate,
+            @RequestParam("files") List<MultipartFile> files
+            ) {
+        User user = (User) httpSession.getAttribute("user");
+        try {
+            ImgurImage response = imgurService.uploadImage(user, files.getFirst(), "", "");
+        } catch (IOException e) {
+            Logger.getGlobal().warning("Error occurred when uploading files. Message: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return "uploadMemory";
     }
 }

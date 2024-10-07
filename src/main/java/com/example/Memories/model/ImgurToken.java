@@ -17,7 +17,6 @@ public class ImgurToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tokenId;
-
     @OneToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore

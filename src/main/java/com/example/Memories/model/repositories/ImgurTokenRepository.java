@@ -8,4 +8,5 @@ import org.springframework.data.repository.query.Param;
 
 public interface ImgurTokenRepository {
     ImgurToken save(ImgurToken imgurToken);
+    void deleteById(Long id);
 }

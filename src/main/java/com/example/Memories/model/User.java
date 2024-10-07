@@ -23,7 +23,7 @@ public class User {
     private String email;
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private ImgurToken imgurToken;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Memory> memories;
 
     public User(String name, String email, ImgurToken imgurToken, List<Memory> memories) {
