@@ -59,13 +59,7 @@ public class PhotoController {
             @RequestParam("files") List<MultipartFile> files
             ) {
         User user = (User) httpSession.getAttribute("user");
-        try {
-            ImgurImage response = imgurService.uploadImage(user, files.getFirst(), "", "");
-        } catch (IOException e) {
-            Logger.getGlobal().warning("Error occurred when uploading files. Message: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-
+        ImgurImage response = imgurService.uploadImage(user, files.getFirst(), "", "");
         return "uploadMemory";
     }
 }

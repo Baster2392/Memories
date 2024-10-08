@@ -1,5 +1,6 @@
 package com.example.Memories.service;
 
+import com.example.Memories.exception.memories.upload.WrongDateFormatException;
 import com.example.Memories.model.Memory;
 import com.example.Memories.model.User;
 import com.example.Memories.model.repositories.MemoryRepository;
@@ -38,7 +39,6 @@ public class MemoryService {
         return memories;
     }
 
-    @Transactional
     public User saveMemory(
             User user,
             String title,
@@ -46,9 +46,10 @@ public class MemoryService {
             String startDate,
             String endDate,
             List<MultipartFile> files
-    ) throws ParseException, IOException {
+    ) {
         // Upload all files to account
         List<ImgurImage> imgurImages = new ArrayList<>();
+
         for (MultipartFile file : files) {
             imgurImages.add(imgurService.uploadImage(user, file, "", ""));
         }
@@ -58,14 +59,19 @@ public class MemoryService {
 
         // Create and save Memory in database
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Memory memory = new Memory(
-                title,
-                description,
-                imgurAlbumCreationResponse.getId(),
-                formatter.parse(startDate),
-                formatter.parse(endDate),
-                user
-        );
+        Memory memory = null;
+        try {
+            memory = new Memory(
+                    title,
+                    description,
+                    imgurAlbumCreationResponse.getId(),
+                    formatter.parse(startDate),
+                    formatter.parse(endDate),
+                    user
+            );
+        } catch (ParseException e) {
+            throw new WrongDateFormatException(e); // TODO: Fix exception throwing
+        }
         memoryRepository.save(memory);
         return user;
     }

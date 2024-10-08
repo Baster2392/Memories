@@ -2,6 +2,7 @@ package com.example.Memories.service;
 
 import com.example.Memories.exception.imgur.ImgurServiceException;
 import com.example.Memories.exception.imgur.upload.*;
+import com.example.Memories.exception.memories.upload.MediaFileParsingException;
 import com.example.Memories.model.ImgurToken;
 import com.example.Memories.model.User;
 import com.example.Memories.model.response.ImgurAlbumCreationResponse;
@@ -25,6 +26,7 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -77,23 +79,17 @@ public class ImgurService {
         logger.info("Sending imgur token update request...");
         Map<String, Object> responseMap = response.block();
         logger.info("New imgur token obtained.");
-        String accessToken = (String) responseMap.get("access_token");
+
+        String accessToken = (String) Objects.requireNonNull(responseMap).get("access_token");
         String refreshToken = (String) responseMap.get("refresh_token");
         Long expiresIn = (long) (3600 * 1000);
         Long currentTime = System.currentTimeMillis();
-        System.out.println(expiresIn);
-        System.out.println(currentTime);
         expiresIn = expiresIn + currentTime;
-        System.out.println(expiresIn);
         String accountUsername = (String) responseMap.get("account_username");
 
         // Save new token
-        System.out.println(user.getImgurToken().getAccessToken());
-        System.out.println(user.getImgurToken().getExpiresIn());
         ImgurToken newToken = new ImgurToken(accessToken, refreshToken, expiresIn, accountUsername);
         userService.updateUserImgurToken(user, newToken);
-        System.out.println(user.getImgurToken().getAccessToken());
-        System.out.println(user.getImgurToken().getExpiresIn());
     }
 
     public List<ImgurImage> getImages(User user) throws JsonProcessingException {
@@ -121,7 +117,7 @@ public class ImgurService {
             return objectMapper.treeToValue(rootNode.get("data"), dataClass);
         } catch (JsonProcessingException e) {
             logger.error("Exception during parsing json.");
-            throw new UnprocessableResponseException("Response: " + response);
+            throw new UnprocessableResponseException("Error parsing JSON. Response: " + response);
         }
     }
 
@@ -147,14 +143,18 @@ public class ImgurService {
                 .collect(Collectors.toList());
     }
 
-    public ImgurImage uploadImage(User user, MultipartFile image, String title, String description) throws IOException {
+    public ImgurImage uploadImage(User user, MultipartFile image, String title, String description) {
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        map.add("image", new ByteArrayResource(image.getBytes()) {
-            @Override
-            public String getFilename() {
-                return image.getOriginalFilename();
-            }
-        });
+        try {
+            map.add("image", new ByteArrayResource(image.getBytes()) {
+                @Override
+                public String getFilename() {
+                    return image.getOriginalFilename();
+                }
+            });
+        } catch (IOException e) {
+            throw new MediaFileParsingException(e);
+        }
         map.add("type", "image");
         map.add("title", title);
         map.add("description", description);

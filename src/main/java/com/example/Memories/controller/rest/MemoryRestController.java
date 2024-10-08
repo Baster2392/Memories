@@ -52,17 +52,8 @@ public class MemoryRestController {
             @RequestParam("files") List<MultipartFile> files
     ) {
         User user = (User) httpSession.getAttribute("user");
-        try {
-            user = memoryService.saveMemory(user, title, description, startDate, endDate, files);
-            httpSession.setAttribute("user", user);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ImgurServiceException e) {
-            return ResponseEntity.status(500).body(e.getMessage());
-        }
-
+        user = memoryService.saveMemory(user, title, description, startDate, endDate, files);
+        httpSession.setAttribute("user", user);
         return ResponseEntity.ok("Memory saved.");
     }
 }
