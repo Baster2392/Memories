@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -47,6 +49,17 @@ public class MemoryService {
             String endDate,
             List<MultipartFile> files
     ) {
+        // Parse dates
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDateParsed;
+        Date endDateParsed;
+        try {
+            startDateParsed = formatter.parse(startDate);
+            endDateParsed = formatter.parse(endDate);
+        } catch (ParseException e) {
+            throw new WrongDateFormatException(e);
+        }
+
         // Upload all files to account
         List<ImgurImage> imgurImages = new ArrayList<>();
 
@@ -58,20 +71,14 @@ public class MemoryService {
         ImgurAlbumCreationResponse imgurAlbumCreationResponse = imgurService.createAlbum(user, title, description, imgurImages);
 
         // Create and save Memory in database
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Memory memory = null;
-        try {
-            memory = new Memory(
-                    title,
-                    description,
-                    imgurAlbumCreationResponse.getId(),
-                    formatter.parse(startDate),
-                    formatter.parse(endDate),
-                    user
-            );
-        } catch (ParseException e) {
-            throw new WrongDateFormatException(e); // TODO: Fix exception throwing
-        }
+        Memory memory = new Memory(
+                title,
+                description,
+                imgurAlbumCreationResponse.getId(),
+                startDateParsed,
+                endDateParsed,
+                user
+        );
         memoryRepository.save(memory);
         return user;
     }

@@ -19,6 +19,14 @@
         window.location.assign(window.location.href + "imgur/connect");
     }
 
+    function onClickUploadMemory() {
+        window.location.assign(window.location.origin + "/memories/upload")
+    }
+
+    function onClickShowAllMemories() {
+        window.location.assign(window.location.origin + "/memories/all")
+    }
+
     function onClickDisconnectImgur() {
         const req = new XMLHttpRequest();
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
@@ -50,7 +58,13 @@
     else
     {
         imgurAccountStatus.innerHTML = imgurAccountStatus.innerHTML +
-            "<br/><button type='button' onclick=onClickDisconnectImgur()>Disconnect from Imgur</button>"
+            "<br/><button type='button' onclick=onClickDisconnectImgur()>Disconnect from Imgur</button>" +
+            "<div>" +
+            "<button type='button' onclick=onClickUploadMemory()>Upload memory</button>" +
+            "</div>" +
+            "<div>" +
+            "<button type='button' onclick=onClickShowAllMemories()>Show memories</button>" +
+            "</div>"
     }
 </script>
 </html>
